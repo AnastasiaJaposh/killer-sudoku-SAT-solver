@@ -28,6 +28,7 @@ def parse_input(filepath):
     for i in range(cage_count):
         l = f.readline().split()
         g.cages.append(cage(int(l[0]), int(l[1]), l[2:]))
+    f.close()
 
 parse_input("small_grid2x2.in")
 for c in g.cages:
