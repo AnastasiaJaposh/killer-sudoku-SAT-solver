@@ -25,3 +25,47 @@ def unique_square_value_condition(file):
                     f.write(f"-{convert(k, i, j)} -{convert(l, i, j)} 0\n")
                     g.formulas_count += 1
     f.close()
+
+def row_condition(file):
+    # in each row we have at least 1 k and at most 1 k
+    # at least 1:
+    f = open(file, "a")
+    at_least_one = ""
+    for k in range(1, g.m + 1):
+        for i in range(g.m):
+            for j in range(g.m):
+                at_least_one += f"{convert(k, i, j)} "
+            f.write(at_least_one + "0\n")
+            g.formulas_count += 1
+            at_least_one = ""
+
+    # at most 1:
+    for k in range(1, g.m + 1):
+        for i in range(g.m):
+            for j in range(g.m):
+                for l in range(j + 1, g.m):
+                    f.write(f"-{convert(k, i, j)} -{convert(k, i, l)} 0\n")
+                    g.formulas_count += 1
+    f.close()
+
+def column_condition(file):
+    # in each column we have at least 1 k and at most 1 k
+    # at least 1:
+    f = open(file, "a")
+    at_least_one = ""
+    for k in range(1, g.m + 1):
+        for j in range(g.m):
+            for i in range(g.m):
+                at_least_one += f"{convert(k, i, j)} "
+            f.write(at_least_one + "0\n")
+            g.formulas_count += 1
+            at_least_one = ""
+
+    # at most 1:
+    for k in range(1, g.m + 1):
+        for j in range(g.m):
+            for i in range(g.m):
+                for l in range(i + 1, g.m):
+                    f.write(f"-{convert(k, i, j)} -{convert(k, l, j)} 0\n")
+                    g.formulas_count += 1
+    f.close()    

@@ -21,19 +21,20 @@ class cage:
         self.squares.append((row, column))
         
         
-def parse_input(filepath):
+def parse(filepath):
     f = open(filepath, "r")
     g.n = int(f.readline())
+    g.m = g.n * g.n
     cage_count = int(f.readline())
     for i in range(cage_count):
         l = f.readline().split()
         g.cages.append(cage(int(l[0]), int(l[1]), l[2:]))
     f.close()
 
-parse_input("small_grid2x2.in")
-for c in g.cages:
-    print(f"sum = {c.sum}, count  = {c.count}, squares = ", end="")
-    print(*c.squares)
+# parse_input("small_grid2x2.in")
+# for c in g.cages:
+#     print(f"sum = {c.sum}, count  = {c.count}, squares = ", end="")
+#     print(*c.squares)
 
         
 
