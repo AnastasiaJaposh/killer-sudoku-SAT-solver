@@ -90,7 +90,6 @@ def format_combinations(cage, combinations):
         l = []
         for j in range(len(combinations[i])):
             l.append((combinations[i][j], cage.squares[j][0], cage.squares[j][1])) # (k, i, j) tuple
-        # print(*l)
         formatted_combinations.append(l[:])
     return formatted_combinations
 
@@ -133,17 +132,16 @@ def subsets(n, k):
 
     def go(i): # the highest element in the stack, remaining count of elements
         if len(stack) == k:
-            print(*stack)
             subsets.append(stack[:])
             return
-        if i > n:
+        if i >= n:
             return
 
         stack.append(i)
         go(i + 1) # add the element to the stack
         stack.pop()
         go(i + 1) # don't add the element to the stack
-    go(1)
+    go(0)
 
     return subsets
         
@@ -173,5 +171,29 @@ def cage_condition(file):
     #     print(*combs)
     # then take the variables and convert it to cnf
     # to do this, we need to calculate (n choose k) values, so all k-element subsets of {1, ..., n}
-    pass
+    f = open(file, "a")
+    for cag in g.cages:
+        combinations = all_combinations(cag)
+        # print(*combinations)
+        # print()
+        for combination in combinations: # example of a combination: for cage with sum 7 and count 3: [(1, 0, 0), (2, 0, 1), (4, 0, 2)]
+            # print("currently on this combination")
+            # print(*combination)
+            # print()
+            for choose in range(cag.count - 1, -1, -2): # (n choose n - 1), (n choose n - 3) ... if odd(n choose 0), if even (n choose 1)
+                subs = subsets(cag.count, choose)
+                for sub in subs:
+                    formula = ""
+                    # print(f"currently chosen subset: {sub}")
+                    for ind in range(cag.count):
+                        if(ind in sub):
+                            formula += f"-{convert(combination[ind][0], combination[ind][1], combination[ind][2])} " # negate the chosen elements
+                        else:
+                            formula += f"{convert(combination[ind][0], combination[ind][1], combination[ind][2])} " # keep the non-chosen elements
+                    # print(formula + "0")
+                    f.write(formula + "0\n")
+                    g.formulas_count += 1
+        # print("cage ended\n")
+    
+
 
