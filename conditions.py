@@ -92,6 +92,7 @@ def format_combinations(cage, combinations):
             l.append((combinations[i][j], cage.squares[j][0], cage.squares[j][1])) # (k, i, j) tuple
         # print(*l)
         formatted_combinations.append(l[:])
+    return formatted_combinations
 
 
 
@@ -126,6 +127,26 @@ def all_combinations(cage):
     return format_combinations(cage, combinations)
 
 
+def subsets(n, k):
+    stack = []
+    subsets = []
+
+    def go(i): # the highest element in the stack, remaining count of elements
+        if len(stack) == k:
+            print(*stack)
+            subsets.append(stack[:])
+            return
+        if i > n:
+            return
+
+        stack.append(i)
+        go(i + 1) # add the element to the stack
+        stack.pop()
+        go(i + 1) # don't add the element to the stack
+    go(1)
+
+    return subsets
+        
 
 def cage_condition(file):
     # for the cage condition, we will calculate all possible combinations for each cage
@@ -147,7 +168,10 @@ def cage_condition(file):
     # if n odd: (n choose 0) + (n choose 2) + (n choose 4) + ... + (n choose n - 1)
 
     # first we need to calculate all the possible combinations for the sum(ordering matters)
+    # for cag in g.cages:
+    #     combs = all_combinations(cag)
+    #     print(*combs)
     # then take the variables and convert it to cnf
+    # to do this, we need to calculate (n choose k) values, so all k-element subsets of {1, ..., n}
     pass
-
 
