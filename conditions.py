@@ -1,4 +1,5 @@
 import globals as g;
+import parse_input as p;
 
 def convert(k, r, c):
     return (k - 1)*(g.m**2) + r*g.m + c + 1
@@ -82,5 +83,71 @@ def block_condition(file):
                 g.formulas_count += 1
                 at_least_one = ""
     f.close()    
+
+def format_combinations(cage, combinations):
+    formatted_combinations = []
+    for i in range(len(combinations)):
+        l = []
+        for j in range(len(combinations[i])):
+            l.append((combinations[i][j], cage.squares[j][0], cage.squares[j][1])) # (k, i, j) tuple
+        # print(*l)
+        formatted_combinations.append(l[:])
+
+
+
+def all_combinations(cage):
+    # we have squares and we want to return all possible combinations 
+    n = cage.count
+    sum = cage.sum
+
+    used = [False]*(g.m + 1)
+    stack = []
+    combinations = []
+    def go(i, rem): # i := number of squares left in the cage, rem := sum of the remaining squares
+        if i == 0:
+            if rem == 0:
+                # print(*stack)
+                combinations.append(stack[:])
+            return
+
+        for j in range(1, g.m + 1): # we can't have more than g.m
+            if used[j]:
+                continue
+            if rem - j < 0:
+                break;
+            stack.append(j)
+            used[j] = True;
+            go(i - 1, rem - j)
+            stack.pop()
+            used[j] = False
+
+    
+    go(n, sum)
+    return format_combinations(cage, combinations)
+
+
+
+def cage_condition(file):
+    # for the cage condition, we will calculate all possible combinations for each cage
+    # and then use double implications for representing them, for example
+    # if we have a cage of length 2(00, 01 squares) and sum 5 in 4x4 grid, we will write
+    # p1,00 <-> p4,01; p4,00 <-> p1,01; p2,00 <-> p3,01; p3,00 <-> p2,01
+    # p_k,ij means that k is on (i,j) square
+    # lets say we have cage of length 3(00, 01, 02) and sum 9 in 9x9 grid
+    # then for each combination we will have: (eg 1 2 6)
+    # p1,00 <-> (p2,01 <-> p6,02)
+    # p1,00 <-> (p2,02, <-> p6,01)
+    # p2,00 <-> (p1,01 <-> p)
+    
+    # I practiced on online converters and saw this pattern
+    # lets say we have p_1 <-> (p_2 <->(p_3 <-> .....(p_n-1 <-> p_n)))
+    # if we convert it to cnf we will get these clauses
+    # (n choose k) means that we choose k elementary variables to negate
+    # if n even: (n choose 1) + (n choose 3) + (n choose 5) + ... + (n choose n - 1)
+    # if n odd: (n choose 0) + (n choose 2) + (n choose 4) + ... + (n choose n - 1)
+
+    # first we need to calculate all the possible combinations for the sum(ordering matters)
+    # then take the variables and convert it to cnf
+    pass
 
 
