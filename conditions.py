@@ -83,116 +83,157 @@ def block_condition(f):
                 at_least_one = ""
     # f.close()    
 
-def format_combinations(cage, combinations):
-    formatted_combinations = []
-    for i in range(len(combinations)):
-        l = []
-        for j in range(len(combinations[i])):
-            l.append((combinations[i][j], cage.squares[j][0], cage.squares[j][1])) # (k, i, j) tuple
-        formatted_combinations.append(l[:])
-    return formatted_combinations
+def is_valid(cage, assignment):
+    return cage.sum == sum(assignment) and len(set(assignment)) == len(assignment) # no duplicate elements
 
-
-
-def all_combinations(cage):
-    # we have squares and we want to return all possible combinations 
-    n = cage.count
-    sum = cage.sum
-
-    used = [False]*(g.m + 1)
+def every_combination(cage):
     stack = []
-    combinations = []
-    def go(i, rem): # i := number of squares left in the cage, rem := sum of the remaining squares
-        if i == 0:
-            if rem == 0:
-                # print(*stack)
-                combinations.append(stack[:])
+    combs = []
+
+    def go():
+        if len(stack) == cage.count:
+            combs.append(tuple(stack))
             return
 
-        for j in range(1, g.m + 1): # we can't have more than g.m
-            if used[j]:
-                continue
-            if rem - j < 0:
-                break;
-            stack.append(j)
-            used[j] = True;
-            go(i - 1, rem - j)
+        for i in range(1, g.m + 1):
+            stack.append(i)
+            go()
             stack.pop()
-            used[j] = False
 
-    
-    go(n, sum)
-    return format_combinations(cage, combinations)
+    go()
+    return combs
 
 
-def subsets(n, k):
-    stack = []
-    subsets = []
-
-    def go(i): # the highest element in the stack, remaining count of elements
-        if len(stack) == k:
-            subsets.append(stack[:])
-            return
-        if i >= n:
-            return
-
-        stack.append(i)
-        go(i + 1) # add the element to the stack
-        stack.pop()
-        go(i + 1) # don't add the element to the stack
-    go(0)
-
-    return subsets
-        
 
 def cage_condition(f):
-    # for the cage condition, we will calculate all possible combinations for each cage
-    # and then use double implications for representing them, for example
-    # if we have a cage of length 2(00, 01 squares) and sum 5 in 4x4 grid, we will write
-    # p1,00 <-> p4,01; p4,00 <-> p1,01; p2,00 <-> p3,01; p3,00 <-> p2,01
-    # p_k,ij means that k is on (i,j) square
-    # lets say we have cage of length 3(00, 01, 02) and sum 9 in 9x9 grid
-    # then for each combination we will have: (eg 1 2 6)
-    # p1,00 <-> (p2,01 <-> p6,02)
-    # p1,00 <-> (p2,02, <-> p6,01)
-    # p2,00 <-> (p1,01 <-> p)
-    
-    # I practiced on online converters and saw this pattern
-    # lets say we have p_1 <-> (p_2 <->(p_3 <-> .....(p_n-1 <-> p_n)))
-    # if we convert it to cnf we will get these clauses
-    # (n choose k) means that we choose k elementary variables to negate
-    # if n even: (n choose 1) + (n choose 3) + (n choose 5) + ... + (n choose n - 1)
-    # if n odd: (n choose 0) + (n choose 2) + (n choose 4) + ... + (n choose n - 1)
-
-    # first we need to calculate all the possible combinations for the sum(ordering matters)
-    # for cag in g.cages:
-    #     combs = all_combinations(cag)
-    #     print(*combs)
-    # then take the variables and convert it to cnf
-    # to do this, we need to calculate (n choose k) values, so all k-element subsets of {1, ..., n}
-    # f = open(file, "a")
+    # another approach is to use the models to convert to cnf
+    # lets say we have cage of sum 7 and count 2 in 9x9 grid:
+    # 1 6, 2 5, 3 4, 6 1, 5 2, 4 3. the models would be corresponding to these
+    # to convert it to cnf, we should compute all non-models
+    # 1 1, 1 2, 1 3, 1 4, 1 5, 2 1, 2 2, ...
+    # and the use the negated variables
+    # first calculate all digit combinations which is (1,1), (1,2) etc for count 2
+    # then determine if they are valid
+    # if they arent valid negate each variable and add to the file
     for cag in g.cages:
-        combinations = all_combinations(cag)
-        # print(*combinations)
-        # print()
-        for combination in combinations: # example of a combination: for cage with sum 7 and count 3: [(1, 0, 0), (2, 0, 1), (4, 0, 2)]
-            # print("currently on this combination")
-            # print(*combination)
-            # print()
-            for choose in range(cag.count - 1, -1, -2): # (n choose n - 1), (n choose n - 3) ... if odd(n choose 0), if even (n choose 1)
-                subs = subsets(cag.count, choose)
-                for sub in subs:
-                    formula = ""
-                    # print(f"currently chosen subset: {sub}")
-                    for ind in range(cag.count):
-                        if(ind in sub):
-                            formula += f"-{convert(combination[ind][0], combination[ind][1], combination[ind][2])} " # negate the chosen elements
-                        else:
-                            formula += f"{convert(combination[ind][0], combination[ind][1], combination[ind][2])} " # keep the non-chosen elements
-                    # print(formula + "0")
-                    f.write(formula + "0\n")
-                    g.formulas_count += 1
-        # print("cage ended\n")
+        for combination in every_combination(cag): # combination would be (1,1) or (1,2) etc
+            if(is_valid(cag, combination)):
+                continue
+
+            formula = ""
+            for i in range(cag.count):
+                formula += f"-{convert(combination[i], cag.squares[i][0], cag.squares[i][1])} "
+            f.write(formula + "0\n")
+            g.formulas_count += 1
+
+# def format_combinations(cage, combinations):
+#     formatted_combinations = []
+#     for i in range(len(combinations)):
+#         l = []
+#         for j in range(len(combinations[i])):
+#             l.append((combinations[i][j], cage.squares[j][0], cage.squares[j][1])) # (k, i, j) tuple
+#         formatted_combinations.append(l[:])
+#     return formatted_combinations
+
+
+
+# def all_combinations(cage):
+#     # we have squares and we want to return all possible combinations 
+#     n = cage.count
+#     sum = cage.sum
+
+#     used = [False]*(g.m + 1)
+#     stack = []
+#     combinations = []
+#     def go(i, rem): # i := number of squares left in the cage, rem := sum of the remaining squares
+#         if i == 0:
+#             if rem == 0:
+#                 # print(*stack)
+#                 combinations.append(stack[:])
+#             return
+
+#         for j in range(1, g.m + 1): # we can't have more than g.m
+#             if used[j]:
+#                 continue
+#             if rem - j < 0:
+#                 break;
+#             stack.append(j)
+#             used[j] = True;
+#             go(i - 1, rem - j)
+#             stack.pop()
+#             used[j] = False
+
     
+#     go(n, sum)
+#     return format_combinations(cage, combinations)
 
 
+# def subsets(n, k):
+#     stack = []
+#     subsets = []
+
+#     def go(i): # the highest element in the stack, remaining count of elements
+#         if len(stack) == k:
+#             subsets.append(stack[:])
+#             return
+#         if i >= n:
+#             return
+
+#         stack.append(i)
+#         go(i + 1) # add the element to the stack
+#         stack.pop()
+#         go(i + 1) # don't add the element to the stack
+#     go(0)
+
+#     return subsets
+        
+
+# def cage_condition(f):
+#     # for the cage condition, we will calculate all possible combinations for each cage
+#     # and then use double implications for representing them, for example
+#     # if we have a cage of length 2(00, 01 squares) and sum 5 in 4x4 grid, we will write
+#     # p1,00 <-> p4,01; p4,00 <-> p1,01; p2,00 <-> p3,01; p3,00 <-> p2,01
+#     # p_k,ij means that k is on (i,j) square
+#     # lets say we have cage of length 3(00, 01, 02) and sum 9 in 9x9 grid
+#     # then for each combination we will have: (eg 1 2 6)
+#     # p1,00 <-> (p2,01 <-> p6,02)
+#     # p1,00 <-> (p2,02, <-> p6,01)
+#     # p2,00 <-> (p1,01 <-> p)
+    
+#     # I practiced on online converters and saw this pattern
+#     # lets say we have p_1 <-> (p_2 <->(p_3 <-> .....(p_n-1 <-> p_n)))
+#     # if we convert it to cnf we will get these clauses
+#     # (n choose k) means that we choose k elementary variables to negate
+#     # if n even: (n choose 1) + (n choose 3) + (n choose 5) + ... + (n choose n - 1)
+#     # if n odd: (n choose 0) + (n choose 2) + (n choose 4) + ... + (n choose n - 1)
+
+#     # first we need to calculate all the possible combinations for the sum(ordering matters)
+#     # for cag in g.cages:
+#     #     combs = all_combinations(cag)
+#     #     print(*combs)
+#     # then take the variables and convert it to cnf
+#     # to do this, we need to calculate (n choose k) values, so all k-element subsets of {1, ..., n}
+#     # f = open(file, "a")
+#     for cag in g.cages:
+#         combinations = all_combinations(cag)
+#         # print(*combinations)
+#         # print()
+#         for combination in combinations: # example of a combination: for cage with sum 7 and count 3: [(1, 0, 0), (2, 0, 1), (4, 0, 2)]
+#             # print("currently on this combination")
+#             # print(*combination)
+#             # print()
+#             for choose in range(cag.count - 1, -1, -2): # (n choose n - 1), (n choose n - 3) ... if odd(n choose 0), if even (n choose 1)
+#                 subs = subsets(cag.count, choose)
+#                 for sub in subs:
+#                     formula = ""
+#                     # print(f"currently chosen subset: {sub}")
+#                     for ind in range(cag.count):
+#                         if(ind in sub):
+#                             formula += f"-{convert(combination[ind][0], combination[ind][1], combination[ind][2])} " # negate the chosen elements
+#                         else:
+#                             formula += f"{convert(combination[ind][0], combination[ind][1], combination[ind][2])} " # keep the non-chosen elements
+#                     # print(formula + "0")
+#                     f.write(formula + "0\n")
+#                     g.formulas_count += 1
+#         # print("cage ended\n")
+    
