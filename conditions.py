@@ -4,8 +4,8 @@ import parse_input as p;
 def convert(k, r, c):
     return (k - 1)*(g.m**2) + r*g.m + c + 1
 
-def unique_square_value_condition(file):
-    f = open(file, "a")
+def unique_square_value_condition(f):
+    # f = open(file, "a")
     
     at_least_one = ""
     # at most one
@@ -19,10 +19,9 @@ def unique_square_value_condition(file):
             f.write(at_least_one + "0\n")
             g.formulas_count += 1
             at_least_one = ""
-    f.close()
 
-def row_condition(file):
-    f = open(file, "a")
+def row_condition(f):
+    # f = open(file, "a")
     at_least_one = ""
 
     for k in range(1, g.m + 1):
@@ -35,10 +34,10 @@ def row_condition(file):
             f.write(at_least_one + "0\n")
             g.formulas_count += 1
             at_least_one = ""
-    f.close()
+    # f.close()
 
-def column_condition(file):
-    f = open(file, "a")
+def column_condition(f):
+    # f = open(file, "a")
     at_least_one = ""
 
 
@@ -52,12 +51,12 @@ def column_condition(file):
             f.write(at_least_one + "0\n")
             g.formulas_count += 1
             at_least_one = ""
-    f.close()    
+    # f.close()    
 
 def block_offset_to_coordinate(x, y, p):
     return x * g.n + (p // g.n), y * g.n + (p % g.n)
 
-def block_condition(file):
+def block_condition(f):
     # in each block we have at least 1 k and at most 1 k
     # I will represet each block with its x and y indices
     # in each block squares will be named this way as their offset to x*n and y*n (example when n = 3 and m = 9)
@@ -66,7 +65,7 @@ def block_condition(file):
     # +6 +7 +8
     # so if we have lets say +5 offset, we can identify that the coordinates of this in the grid is x * n + (5 // g.n), y * n + (5 % g.n)
 
-    f = open(file, "a")
+    # f = open(file, "a")
     
     at_least_one = ""
     for k in range(1, g.m + 1):
@@ -82,7 +81,7 @@ def block_condition(file):
                 f.write(at_least_one + "0\n")
                 g.formulas_count += 1
                 at_least_one = ""
-    f.close()    
+    # f.close()    
 
 def format_combinations(cage, combinations):
     formatted_combinations = []
@@ -146,7 +145,7 @@ def subsets(n, k):
     return subsets
         
 
-def cage_condition(file):
+def cage_condition(f):
     # for the cage condition, we will calculate all possible combinations for each cage
     # and then use double implications for representing them, for example
     # if we have a cage of length 2(00, 01 squares) and sum 5 in 4x4 grid, we will write
@@ -171,7 +170,7 @@ def cage_condition(file):
     #     print(*combs)
     # then take the variables and convert it to cnf
     # to do this, we need to calculate (n choose k) values, so all k-element subsets of {1, ..., n}
-    f = open(file, "a")
+    # f = open(file, "a")
     for cag in g.cages:
         combinations = all_combinations(cag)
         # print(*combinations)

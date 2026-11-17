@@ -1,7 +1,7 @@
 # n
 # #_of_cages
 # lines defining cages:
-# sum #_of_blocks __ __ __ } blocks, seperated by spaces
+# sum #_of_blocks __ __ __ } blocks, seperated by spaces, padded to the the left
 
 import globals as g;
 
@@ -31,10 +31,6 @@ def parse(filepath):
         g.cages.append(cage(int(l[0]), int(l[1]), l[2:]))
     f.close()
 
-# parse_input("small_grid2x2.in")
-# for c in g.cages:
-#     print(f"sum = {c.sum}, count  = {c.count}, squares = ", end="")
-#     print(*c.squares)
 
         
 
