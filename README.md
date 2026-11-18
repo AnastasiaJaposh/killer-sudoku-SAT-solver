@@ -33,7 +33,7 @@ It should look like this
 > *{arbitrary amount of lines defining cages}*
 
 Note: n is the square root of grid width/height, so we will have $n^2 X n^2$ grid.\
-Lines defining cages should be in this format:\
+Lines defining cages should be in this format:
 > *{sum}* *{number of squares in the cage}* *{list of squares, delimited by space character, 0-indexed row and column indices left-padded with zeros(if needed) and concatenated}*
 
 padding is needed if there is variable number of digits for an index.
@@ -50,7 +50,7 @@ To run the script, run the main method "main.py" with the argument being the nam
 Proposition for number k, being on row i and column j is calculated the following way:
 > $(k - 1)n^4 + i \cdot n^2 + j + 1$
 
-This way each proposition 1,...,n^3 is taken.
+This way each proposition $1,...,n^3$ is taken.
 
 For rules 1,...,4 mentioned above, I calculate the formulas the following way
 1. At least 1 k in the square/row/column/block
