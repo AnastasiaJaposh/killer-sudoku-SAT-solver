@@ -4,7 +4,7 @@ Killer Sudoku is a problem involing an NxN grid, where N is a perfect square.\
 At first we are given an empty grid, with cages defined.
 
 *cage*: A set of adjacent squares in the grid, with designated sum\
-*block*: A Sqrt(N) X Sqrt(N) aligned subgrid
+*block*: A $\sqrt{n} X \sqrt{n}$ aligned subgrid
 
 The solution will be inserting a number 1,...,N in each block, so that:
 1. There is an unique number on each square
@@ -32,7 +32,7 @@ It should look like this
 > *{number of cages}*\
 > *{arbitrary amount of lines defining cages}*
 
-Note: n is the square root of grid width/height, so we will have n^2 X n^2 grid.\
+Note: n is the square root of grid width/height, so we will have $n^2 X n^2$ grid.\
 Lines defining cages should be in this format:\
 > *{sum}* *{number of squares in the cage}* *{list of squares, delimited by space character, 0-indexed row and column indices left-padded with zeros(if needed) and concatenated}*
 
@@ -48,7 +48,7 @@ To run the script, run the main method "main.py" with the argument being the nam
 
 ## Encoding into CNF
 Proposition for number k, being on row i and column j is calculated the following way:
-> (k - 1)(n^4) + i*(n^2) + j + 1
+> $(k - 1)n^4 + i \cdot n^2 + j + 1$
 
 This way each proposition 1,...,n^3 is taken.
 
@@ -68,4 +68,8 @@ In the file there are total of 6 instances provided. They can be viewed in ./ins
 6. grid_4.in - 16x16 grid, which takes too long to compute(wouldn't recommend running it, just for demonstration)
 
 ## Conducted experiments
-All results mentioned here can be found in the directory: ./results/
+Conducted experiments for these instances. *instance* - *experiment_output_file*:
+1. grid_2.in - ./result/grid_2_solved.txt
+2. grid_3.in - ./result/grid_3_solved.txt
+3. grid_3_harder.in - ./result/grid_3_harder_solved.txt
+4. grid_unsat_2.in - ./result/grid_unsat_2_output.txt
